@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Unit 7.1 – Stripes & Spots | Adjective Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+/* ===== CSS VARIABLES ===== */
+:root {
+  --primary: #5548C8;
+  --primary-dark: #3D35A0;
+  --primary-light: #7B6FE0;
+  --num: #1565C0;
+  --num-light: #E3F2FD;
+  --siz: #2E7D32;
+  --siz-light: #E8F5E9;
+  --col: #C62828;
+  --col-light: #FFEBEE;
+  --gold: #FFB300;
+  --green-btn: #2E7D32;
+  --bg: #F0EEFF;
+  --white: #FFFFFF;
+  --text: #1A1A2E;
+  --muted: #888;
+  --shadow: 0 6px 28px rgba(85,72,200,0.18);
+}
+
+/* ===== BASE ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  width: 100vw; height: 100vh;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* ===== PROGRESS BAR ===== */
+#progressBar {
+  position: fixed; top: 0; left: 0; height: 5px; z-index: 9999;
+  background: linear-gradient(90deg, #FFB300, #FF6B35, #FF4081);
+  transition: width 0.5s ease;
+  box-shadow: 0 2px 8px rgba(255,180,0,0.5);
+}
+
+/* ===== NAV ARROWS ===== */
+.nav-arrow {
+  position: fixed; top: 50%; transform: translateY(-50%);
+  background: var(--primary); color: #fff; border: none;
+  width: clamp(44px, 5vh, 64px); height: clamp(44px, 5vh, 64px);
+  border-radius: 50%; font-size: clamp(20px, 2.5vh, 32px);
+  cursor: pointer; z-index: 9000; opacity: 0.75;
+  transition: opacity 0.2s, transform 0.2s;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(85,72,200,0.3);
+}
+.nav-arrow:hover { opacity: 1; transform: translateY(-50%) scale(1.08); }
+.nav-arrow.prev { left: 10px; }
+.nav-arrow.next { right: 10px; }
+
+/* ===== NAV DOTS ===== */
+#navDots {
+  position: fixed; bottom: 1.2vh; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 10px; z-index: 9000;
+}
+.nav-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(85,72,200,0.25); cursor: pointer;
+  transition: all 0.3s; border: 2px solid transparent;
+}
+.nav-dot.active {
+  background: var(--primary); transform: scale(1.35);
+  border-color: #fff; box-shadow: 0 2px 8px rgba(85,72,200,0.4);
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.45s ease;
+  overflow: hidden;
+}
+.section.active { opacity: 1; pointer-events: all; }
+
+/* ===== SECTION HEADER ===== */
+.sec-hdr {
+  background: linear-gradient(135deg, #5548C8 0%, #3D35A0 100%);
+  color: #fff; padding: clamp(10px,1.4vh,18px) clamp(16px,2.5vw,40px);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(85,72,200,0.35);
+  min-height: clamp(56px, 9vh, 90px);
+}
+.sec-hdr h1 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(22px, 3.2vw, 50px); font-weight: 800;
+  letter-spacing: -0.3px;
+}
+.sec-badge {
+  background: rgba(255,255,255,0.18); border: 2px solid rgba(255,255,255,0.4);
+  color: #fff; padding: 6px 18px; border-radius: 50px;
+  font-size: clamp(13px, 1.4vw, 20px); font-weight: 700; white-space: nowrap;
+}
+
+/* ===== CARD BASE ===== */
+.wcard {
+  background: var(--white); border: 3px solid #DDD; border-radius: 12px;
+  padding: clamp(8px,1.2vh,16px) clamp(14px,1.8vw,28px);
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px, 2.4vw, 36px); font-weight: 700;
+  cursor: grab; text-align: center; color: var(--text);
+  box-shadow: 0 3px 12px rgba(0,0,0,0.10); touch-action: none;
+  transition: box-shadow 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+.wcard:hover:not(.locked) { transform: scale(1.05); box-shadow: 0 8px 24px rgba(0,0,0,0.16); }
+.wcard.dragging { opacity: 0.28; }
+.wcard.locked { cursor: default; }
+.wcard.locked-number { background: var(--num); color: #fff; border-color: var(--num); }
+.wcard.locked-size   { background: var(--siz); color: #fff; border-color: var(--siz); }
+.wcard.locked-colour { background: var(--col); color: #fff; border-color: var(--col); }
+
+/* Floating drag clone */
+#drag-clone {
+  position: fixed; pointer-events: none; z-index: 9998;
+  transform: scale(1.12) rotate(3deg);
+  box-shadow: 0 14px 48px rgba(0,0,0,0.28);
+  display: none; opacity: 0.92;
+}
+
+/* ===== DROP ZONES ===== */
+.drop-zone {
+  border: 3px dashed rgba(0,0,0,0.15); border-radius: 14px;
+  padding: clamp(8px,1vh,14px); display: flex; flex-direction: column;
+  gap: clamp(6px,0.8vh,12px); transition: all 0.2s; min-height: clamp(60px,8vh,120px);
+}
+.drop-zone.over { background: rgba(85,72,200,0.1); border-color: var(--primary); transform: scale(1.02); }
+
+/* ===== COLUMN LAYOUT ===== */
+.col-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(10px,1.5vw,24px); }
+
+.adj-col {
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.10);
+  display: flex; flex-direction: column;
+}
+.adj-col-hdr {
+  padding: clamp(10px,1.5vh,22px) 1vw;
+  text-align: center; color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(22px, 2.8vw, 44px); font-weight: 800;
+  flex-shrink: 0;
+}
+.col-num .adj-col-hdr { background: var(--num); }
+.col-siz .adj-col-hdr { background: var(--siz); }
+.col-col .adj-col-hdr { background: var(--col); }
+.col-num .drop-zone { border-color: var(--num); }
+.col-siz .drop-zone { border-color: var(--siz); }
+.col-col .drop-zone { border-color: var(--col); }
+.adj-col-body { flex: 1; background: rgba(255,255,255,0.92); padding: clamp(8px,1vh,14px); }
+.adj-col-body .drop-zone { height: 100%; }
+
+/* ===== WORD BANK STRIP ===== */
+.word-bank {
+  background: var(--white); border-radius: 16px;
+  padding: clamp(10px,1.4vh,18px) clamp(16px,2vw,28px);
+  display: flex; gap: clamp(10px,1.2vw,20px);
+  align-items: center; flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08); flex-shrink: 0;
+}
+.bank-lbl {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px,1.8vw,26px); font-weight: 800; color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  border: none; border-radius: 14px; cursor: pointer;
+  font-family: 'Baloo 2', sans-serif; font-weight: 800;
+  transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn-green {
+  background: var(--green-btn); color: #fff;
+  padding: clamp(14px,2vh,28px) clamp(36px,5vw,80px);
+  font-size: clamp(26px, 3.5vw, 52px);
+  box-shadow: 0 8px 28px rgba(46,125,50,0.38);
+}
+.btn-green:hover { background: #1B5E20; transform: translateY(-3px); box-shadow: 0 14px 36px rgba(46,125,50,0.48); }
+.btn-primary {
+  background: var(--primary); color: #fff;
+  padding: clamp(10px,1.4vh,18px) clamp(24px,3vw,44px);
+  font-size: clamp(18px, 2vw, 28px);
+  box-shadow: 0 4px 16px rgba(85,72,200,0.3);
+}
+.btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+.btn-red {
+  background: #D32F2F; color: #fff;
+  padding: clamp(12px,1.6vh,20px) clamp(32px,4vw,60px);
+  font-size: clamp(20px, 2.2vw, 32px);
+  box-shadow: 0 4px 16px rgba(211,47,47,0.38);
+}
+.btn-red:hover { background: #B71C1C; transform: translateY(-2px); }
+.btn-example {
+  border: 3px solid; background: var(--white); cursor: pointer;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px, 2.3vw, 34px); font-weight: 700;
+  padding: clamp(12px,1.8vh,22px) clamp(16px,2vw,28px);
+  border-radius: 16px; transition: all 0.2s;
+  display: flex; align-items: center; gap: 1vw;
+  width: 100%;
+}
+.btn-example:hover { transform: scale(1.02); }
+.btn-snake { border-color: var(--siz); color: var(--siz); }
+.btn-snake.active { background: var(--siz); color: #fff; }
+.btn-stars { border-color: var(--num); color: var(--num); }
+.btn-stars.active { background: var(--num); color: #fff; }
+
+/* ===== SECTION 1 ===== */
+#s1 { background: linear-gradient(150deg, #EEF2FF 0%, #D8D0FF 100%); }
+.s1-body { flex: 1; display: flex; align-items: center; justify-content: space-around; padding: clamp(20px,4vh,60px) clamp(40px,6vw,100px); gap: 4vw; }
+.s1-left { display: flex; flex-direction: column; gap: clamp(16px,2.5vh,36px); }
+.s1-unit-pill {
+  display: inline-block; background: var(--primary); color: #fff;
+  padding: 8px 28px; border-radius: 50px;
+  font-size: clamp(16px,1.6vw,24px); font-weight: 800;
+}
+.s1-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(38px, 5.5vw, 80px); font-weight: 800;
+  color: var(--primary-dark); line-height: 1.05;
+}
+.s1-sub {
+  font-size: clamp(22px, 2.8vw, 42px); font-weight: 700; color: #666;
+}
+.s1-right { display: flex; flex-direction: column; align-items: center; gap: 2vh; }
+
+/* ===== SECTION 2 ===== */
+.s2-body { flex: 1; display: flex; gap: clamp(16px,2vw,32px); padding: clamp(12px,2vh,24px) clamp(16px,2.5vw,40px); overflow: hidden; }
+.s2-left { flex: 1; display: flex; flex-direction: column; gap: clamp(10px,1.5vh,20px); min-width: 0; }
+.col-hdr-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(8px,1.2vw,18px); flex-shrink: 0; }
+.col-hdr-box {
+  padding: clamp(8px,1.2vh,16px) 1vw; border-radius: 12px;
+  text-align: center; color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px, 2.4vw, 38px); font-weight: 800;
+}
+.hdr-num { background: var(--num); }
+.hdr-siz { background: var(--siz); }
+.hdr-col { background: var(--col); }
+.s2-reveal {
+  flex: 1; background: var(--white); border-radius: 20px;
+  padding: clamp(16px,2.5vh,36px) clamp(16px,2.5vw,36px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: clamp(12px,1.8vh,24px); box-shadow: var(--shadow); overflow: hidden;
+}
+.s2-sentence {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(26px, 3.8vw, 58px); font-weight: 800;
+  color: var(--text); text-align: center;
+}
+.chip-row { display: flex; gap: clamp(10px,1.4vw,22px); align-items: center; flex-wrap: wrap; justify-content: center; }
+.chip {
+  padding: clamp(8px,1vh,16px) clamp(14px,1.8vw,26px);
+  border-radius: 50px; color: #fff;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px, 2.2vw, 32px); font-weight: 700;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.chip-lbl { font-size: clamp(11px,1vw,16px); opacity: 0.82; font-weight: 600; }
+.chip-num-bg { background: var(--num); }
+.chip-siz-bg { background: var(--siz); }
+.chip-col-bg { background: var(--col); }
+.chip-plain  { background: #666; }
+.info-box {
+  border-radius: 12px; padding: clamp(10px,1.4vh,18px) clamp(14px,2vw,24px);
+  display: flex; align-items: center; gap: 1vw;
+}
+.info-box-tip  { background: #FFF3E0; }
+.info-box-good { background: #E8F5E9; }
+.info-icon { font-size: clamp(20px,2.2vw,32px); flex-shrink: 0; }
+.info-txt {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(16px,1.7vw,26px); font-weight: 700;
+}
+.info-txt.tip  { color: #E65100; }
+.info-txt.good { color: #1B5E20; }
+.s2-right {
+  width: clamp(200px, 24vw, 380px);
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; flex-shrink: 0;
+}
+.order-card {
+  background: var(--white); border-radius: 24px;
+  padding: clamp(16px,2.5vh,36px) clamp(20px,2.5vw,36px);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column; gap: clamp(12px,2vh,28px); align-items: center; width: 100%;
+}
+.order-card-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px,2vw,30px); font-weight: 800;
+  color: var(--primary); text-align: center;
+}
+.order-row { display: flex; align-items: center; gap: 1.2vw; width: 100%; }
+.order-dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.order-row-txt {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(16px,1.8vw,28px); font-weight: 700;
+}
+
+/* ===== SECTION 3 & 5 ===== */
+.s3-body, .s5-body {
+  flex: 1; display: flex; flex-direction: column;
+  gap: clamp(10px,1.5vh,20px);
+  padding: clamp(10px,1.5vh,20px) clamp(16px,2.5vw,40px) clamp(20px,3vh,36px);
+  overflow: hidden;
+}
+
+/* ===== SECTION 4 ===== */
+.s4-body {
+  flex: 1; display: flex; flex-direction: column;
+  padding: clamp(10px,1.5vh,20px) clamp(16px,2.5vw,40px) clamp(20px,3vh,36px);
+  gap: clamp(10px,1.5vh,20px); overflow: hidden;
+}
+.s4-main { flex: 1; display: flex; gap: clamp(14px,2vw,28px); min-height: 0; }
+.s4-pic-panel {
+  flex: 1; background: var(--white); border-radius: 20px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  box-shadow: var(--shadow); padding: clamp(14px,2vh,28px); gap: clamp(10px,1.5vh,20px);
+}
+.pic-emoji { font-size: clamp(48px, 9vh, 120px); line-height: 1.1; text-align: center; }
+.pic-lbl { font-family: 'Baloo 2', sans-serif; font-size: clamp(22px,2.5vw,36px); font-weight: 700; color: #555; text-align: center; }
+.s4-builder-panel {
+  width: clamp(260px, 38vw, 580px);
+  background: var(--white); border-radius: 20px;
+  display: flex; flex-direction: column;
+  padding: clamp(14px,2vh,24px) clamp(14px,2vw,24px);
+  gap: clamp(10px,1.4vh,18px); box-shadow: var(--shadow);
+  flex-shrink: 0;
+}
+.builder-title {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px,1.8vw,26px); font-weight: 800;
+  color: var(--muted); text-align: center;
+}
+.sb-slots { display: flex; gap: clamp(6px,0.8vw,14px); align-items: center; justify-content: center; flex-wrap: wrap; }
+.sb-slot {
+  min-width: clamp(70px,9vw,130px); min-height: clamp(50px,7vh,90px);
+  border: 3px dashed #CCC; border-radius: 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px,2.2vw,32px); font-weight: 700;
+  color: #CCC; transition: all 0.2s; background: #FAFAFA;
+  padding: clamp(6px,0.8vh,12px);
+}
+.sb-slot.over { border-color: var(--primary); background: rgba(85,72,200,0.06); transform: scale(1.04); }
+.sb-slot.filled { color: var(--text); border-style: solid; }
+.sb-slot.slot-number.filled { border-color: var(--num); background: var(--num-light); }
+.sb-slot.slot-size.filled   { border-color: var(--siz); background: var(--siz-light); }
+.sb-slot.slot-colour.filled { border-color: var(--col); background: var(--col-light); }
+.slot-type-lbl { font-size: clamp(10px,0.9vw,14px); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #AAA; }
+.sb-noun-fixed {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(20px,2.4vw,36px); font-weight: 800; color: #555;
+}
+.s4-adj-bank { display: flex; gap: clamp(8px,1vw,16px); flex-wrap: wrap; justify-content: center; align-items: center; }
+.s4-result {
+  min-height: clamp(36px,5vh,60px); display: flex; align-items: center; justify-content: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(22px,2.5vw,36px); font-weight: 800; color: var(--primary);
+  text-align: center;
+}
+.s4-controls { display: flex; gap: 2vw; align-items: center; justify-content: center; flex-shrink: 0; }
+.pic-counter { font-family: 'Baloo 2', sans-serif; font-size: clamp(16px,1.6vw,24px); font-weight: 700; color: var(--muted); }
+
+/* ===== SECTION 6 ===== */
+.s6-body {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: space-evenly;
+  padding: clamp(16px,2.5vh,36px) clamp(40px,6vw,100px);
+  gap: clamp(14px,2vh,28px);
+}
+.s6-instr {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(22px,2.6vw,40px); font-weight: 700;
+  color: var(--text); text-align: center;
+}
+.s6-frame { display: flex; gap: clamp(10px,1.5vw,24px); align-items: center; justify-content: center; flex-wrap: wrap; }
+.s6-plus { font-family: 'Baloo 2', sans-serif; font-size: clamp(22px,2.8vw,44px); font-weight: 800; color: var(--primary); }
+.s6-slot {
+  min-width: clamp(120px,14vw,200px); min-height: clamp(80px,10vh,130px);
+  background: var(--white); border: 4px solid #DDD; border-radius: 18px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.3s;
+  padding: clamp(10px,1.4vh,20px) clamp(12px,1.5vw,22px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.10); position: relative; gap: 4px;
+}
+.s6-slot:hover { transform: scale(1.06); box-shadow: 0 8px 28px rgba(0,0,0,0.16); }
+.s6-slot.selected { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(85,72,200,0.18); }
+.s6-slot-lbl { font-size: clamp(11px,1vw,16px); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #AAA; }
+.s6-slot-val { font-family: 'Baloo 2', sans-serif; font-size: clamp(24px,3vw,48px); font-weight: 800; color: #CCC; }
+.s6-slot.filled .s6-slot-val { color: var(--text); }
+.s6-slot.slot-number.filled { border-color: var(--num); background: var(--num-light); }
+.s6-slot.slot-size.filled   { border-color: var(--siz); background: var(--siz-light); }
+.s6-slot.slot-colour.filled { border-color: var(--col); background: var(--col-light); }
+.s6-slot.slot-noun.filled   { border-color: var(--gold); background: #FFFDE7; }
+.s6-picker {
+  position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%);
+  background: var(--white); border-radius: 16px;
+  box-shadow: 0 10px 48px rgba(0,0,0,0.22);
+  padding: clamp(10px,1.2vh,16px); display: none; z-index: 500;
+  min-width: clamp(140px,16vw,220px);
+  border: 3px solid var(--primary); flex-direction: column; gap: 6px;
+}
+.s6-picker.open { display: flex; }
+.s6-opt {
+  padding: clamp(8px,1vh,14px) clamp(12px,1.4vw,20px); border-radius: 10px;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(18px,2vw,28px); font-weight: 700;
+  cursor: pointer; transition: background 0.15s; color: var(--text);
+}
+.s6-opt:hover { background: var(--bg); }
+.s6-result {
+  min-height: clamp(50px,7vh,90px); display: flex; align-items: center; justify-content: center;
+  font-family: 'Baloo 2', sans-serif;
+  font-size: clamp(26px,3.5vw,56px); font-weight: 800; color: var(--primary);
+  text-align: center;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:translateY(0); } }
+.fade-in-up { animation: fadeInUp 0.4s ease-out both; }
+
+@keyframes lockPop { 0%{transform:scale(1)} 40%{transform:scale(1.32)} 70%{transform:scale(0.9)} 100%{transform:scale(1)} }
+.lock-pop { animation: lockPop 0.42s ease-out; }
+
+@keyframes wrongShake {
+  0%,100%{transform:translateX(0)} 20%{transform:translateX(-9px) rotate(-2deg)}
+  40%{transform:translateX(9px) rotate(2deg)} 60%{transform:translateX(-6px) rotate(-1deg)}
+  80%{transform:translateX(6px) rotate(1deg)}
+}
+.wrong-shake { animation: wrongShake 0.42s ease-out; }
+
+@keyframes celebrate { 0%{transform:scale(1)} 25%{transform:scale(1.06) rotate(-1deg)} 50%{transform:scale(1.10) rotate(1deg)} 75%{transform:scale(1.04) rotate(-0.5deg)} 100%{transform:scale(1)} }
+.celebrate { animation: celebrate 0.65s ease-in-out; }
+
+@keyframes starFly { 0%{transform:scale(0) rotate(0deg);opacity:1} 60%{transform:scale(1.6) rotate(30deg);opacity:1} 100%{transform:scale(0.4) rotate(65deg) translateY(-110px);opacity:0} }
+.star-burst { position:fixed; pointer-events:none; font-size: clamp(40px,5vw,70px); animation: starFly 1.1s ease-out forwards; z-index: 9997; }
+
+@keyframes confettiFall { 0%{transform:translateY(-20px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+.confetti-piece { position:fixed; width:12px; height:12px; pointer-events:none; animation:confettiFall var(--dur,2s) ease-in var(--delay,0s) forwards; z-index:9996; }
+</style>
+</head>
+<body>
+
+<!-- Progress Bar -->
+<div id="progressBar"></div>
+
+<!-- Nav Arrows -->
+<button class="nav-arrow prev btn" id="prevBtn" onclick="prevSection()">◀</button>
+<button class="nav-arrow next btn" id="nextBtn" onclick="nextSection()">▶</button>
+
+<!-- Nav Dots -->
+<div id="navDots">
+  <div class="nav-dot active" onclick="goToSection(1)" title="Section 1"></div>
+  <div class="nav-dot" onclick="goToSection(2)" title="Section 2"></div>
+  <div class="nav-dot" onclick="goToSection(3)" title="Section 3"></div>
+  <div class="nav-dot" onclick="goToSection(4)" title="Section 4"></div>
+  <div class="nav-dot" onclick="goToSection(5)" title="Section 5"></div>
+  <div class="nav-dot" onclick="goToSection(6)" title="Section 6"></div>
+</div>
+
+<!-- ==================== SECTION 1 ==================== -->
+<div class="section active" id="s1">
+  <div class="sec-hdr">
+    <h1>🐍 Stripes and Spots</h1>
+    <span class="sec-badge">Cambridge Global English · Unit 7.1 · Page 113</span>
+  </div>
+  <div class="s1-body">
+    <div class="s1-left">
+      <div class="s1-unit-pill">Language Focus</div>
+      <div class="s1-title">Adjective Order!</div>
+      <div class="s1-sub">Number &nbsp;·&nbsp; Size &nbsp;·&nbsp; Colour</div>
+      <button class="btn btn-green" onclick="goToSection(2)">▶ START LESSON</button>
+    </div>
+    <div class="s1-right">
+      <!-- Snake SVG -->
+      <svg width="300" height="230" viewBox="0 0 300 230" xmlns="http://www.w3.org/2000/svg">
+        <path d="M250,75 Q210,15 155,55 Q100,95 75,55 Q55,18 28,46 Q8,68 18,110 Q28,145 62,130 Q96,115 106,152 Q122,196 96,218" stroke="#388E3C" stroke-width="36" fill="none" stroke-linecap="round"/>
+        <path d="M250,75 Q210,15 155,55 Q100,95 75,55 Q55,18 28,46 Q8,68 18,110 Q28,145 62,130 Q96,115 106,152 Q122,196 96,218" stroke="#1B5E20" stroke-width="36" fill="none" stroke-linecap="round" stroke-dasharray="22 22" opacity="0.5"/>
+        <ellipse cx="256" cy="78" rx="30" ry="23" fill="#4CAF50"/>
+        <ellipse cx="248" cy="71" rx="30" ry="23" fill="#66BB6A"/>
+        <circle cx="256" cy="70" r="9" fill="white"/>
+        <circle cx="257.5" cy="70" r="4.5" fill="#1A1A1A"/>
+        <circle cx="259" cy="68.5" r="1.8" fill="white"/>
+        <path d="M274,82 L290,76 M290,76 L296,71 M290,76 L296,82" stroke="#C62828" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M248,86 Q256,93 264,86" stroke="#2E7D32" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <!-- scales decoration -->
+        <circle cx="140" cy="72" r="5" fill="#2E7D32" opacity="0.5"/>
+        <circle cx="115" cy="82" r="5" fill="#2E7D32" opacity="0.5"/>
+        <circle cx="165" cy="64" r="5" fill="#2E7D32" opacity="0.5"/>
+      </svg>
+      <!-- Stars -->
+      <div style="display:flex; gap:16px; align-items:center;">
+        <svg width="88" height="88" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#FFD700" stroke="#FF8F00" stroke-width="2.5"/></svg>
+        <svg width="64" height="64" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#FFEB3B" stroke="#FFC107" stroke-width="2.5"/></svg>
+        <svg width="88" height="88" viewBox="0 0 100 100"><polygon points="50,5 61,35 95,35 68,57 79,91 50,70 21,91 32,57 5,35 39,35" fill="#FFD700" stroke="#FF8F00" stroke-width="2.5"/></svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 2 ==================== -->
+<div class="section" id="s2">
+  <div class="sec-hdr">
+    <h1>📖 Reading the Examples</h1>
+    <span class="sec-badge">Section 2 of 6</span>
+  </div>
+  <div class="s2-body">
+    <div class="s2-left">
+      <!-- Column headers -->
+      <div class="col-hdr-grid">
+        <div class="col-hdr-box hdr-num">🔢 Number</div>
+        <div class="col-hdr-box hdr-siz">📏 Size</div>
+        <div class="col-hdr-box hdr-col">🎨 Colour</div>
+      </div>
+      <!-- Buttons -->
+      <div style="display:flex; flex-direction:column; gap:clamp(10px,1.5vh,18px);">
+        <button class="btn-example btn-snake" id="snakeBtn" onclick="showExample('snake')">
+          🐍 &nbsp;Snake Example — click to reveal!
+        </button>
+        <button class="btn-example btn-stars" id="starsBtn" onclick="showExample('stars')">
+          ⭐ &nbsp;Stars Example — click to reveal!
+        </button>
+      </div>
+      <!-- Reveal Area -->
+      <div class="s2-reveal" id="s2Reveal">
+        <div style="font-family:'Baloo 2',sans-serif; font-size:clamp(20px,2.4vw,34px); font-weight:700; color:#CCC; text-align:center;">
+          👆 Tap an example button to reveal it
+        </div>
+      </div>
+    </div>
+    <!-- Right panel -->
+    <div class="s2-right">
+      <div class="order-card">
+        <div class="order-card-title">Adjective Order Rule</div>
+        <div class="order-row">
+          <div class="order-dot" style="background:var(--num);"></div>
+          <div class="order-row-txt" style="color:var(--num);">1. Number</div>
+        </div>
+        <div class="order-row">
+          <div class="order-dot" style="background:var(--siz);"></div>
+          <div class="order-row-txt" style="color:var(--siz);">2. Size</div>
+        </div>
+        <div class="order-row">
+          <div class="order-dot" style="background:var(--col);"></div>
+          <div class="order-row-txt" style="color:var(--col);">3. Colour</div>
+        </div>
+        <div style="border-top:2px solid #EEE; width:100%; padding-top:1.5vh; text-align:center;">
+          <div style="font-family:'Baloo 2',sans-serif; font-size:clamp(14px,1.4vw,20px); font-weight:700; color:#999;">Then the noun</div>
+          <div style="font-family:'Baloo 2',sans-serif; font-size:clamp(18px,2vw,28px); font-weight:800; color:#555;">→ object / animal</div>
+        </div>
+        <!-- Mini Snake -->
+        <svg width="130" height="80" viewBox="0 0 130 80" xmlns="http://www.w3.org/2000/svg">
+          <path d="M110,32 Q88,8 64,24 Q40,40 18,24 Q5,16 5,34 Q5,56 28,50" stroke="#4CAF50" stroke-width="16" fill="none" stroke-linecap="round"/>
+          <ellipse cx="113" cy="33" rx="13" ry="10" fill="#4CAF50"/>
+          <circle cx="117" cy="29" r="4" fill="white"/>
+          <circle cx="118" cy="29" r="2" fill="black"/>
+          <path d="M125,36 L132,33 M132,33 L136,30 M132,33 L136,36" stroke="red" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3 ==================== -->
+<div class="section" id="s3">
+  <div class="sec-hdr">
+    <h1>🎯 The Adjective Columns</h1>
+    <span class="sec-badge">Section 3 of 6</span>
+  </div>
+  <div class="s3-body">
+    <!-- Word Bank -->
+    <div class="word-bank" id="s3Bank">
+      <span class="bank-lbl">Word Bank:</span>
+      <div class="wcard" data-word="four"     data-type="number" id="c3-four">four</div>
+      <div class="wcard" data-word="enormous" data-type="size"   id="c3-enormous">enormous</div>
+      <div class="wcard" data-word="tiny"     data-type="size"   id="c3-tiny">tiny</div>
+      <div class="wcard" data-word="crimson"  data-type="colour" id="c3-crimson">crimson</div>
+      <div class="wcard" data-word="dozens"   data-type="number" id="c3-dozens">dozens</div>
+    </div>
+    <!-- Columns -->
+    <div class="col-grid" style="flex:1; min-height:0;">
+      <div class="adj-col col-num">
+        <div class="adj-col-hdr">🔢 Number</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="number" id="s3-drop-num">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+      <div class="adj-col col-siz">
+        <div class="adj-col-hdr">📏 Size</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="size" id="s3-drop-siz">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+      <div class="adj-col col-col">
+        <div class="adj-col-hdr">🎨 Colour</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="colour" id="s3-drop-col">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 4 ==================== -->
+<div class="section" id="s4">
+  <div class="sec-hdr">
+    <h1>🌸 More Pictures: Flowers &amp; Bugs</h1>
+    <span class="sec-badge">Section 4 of 6</span>
+  </div>
+  <div class="s4-body">
+    <div class="s4-controls">
+      <button class="btn btn-primary" onclick="cycleS4()">📸 SHOW NEW PICTURE</button>
+      <span class="pic-counter" id="s4Counter">Picture 1 of 3</span>
+      <button class="btn" style="background:#EEE; color:#555; padding:10px 22px; border-radius:10px; font-size:clamp(16px,1.6vw,22px); font-weight:700;" onclick="clearS4Slots()">🔄 Clear Slots</button>
+    </div>
+    <div class="s4-main">
+      <!-- Picture Panel -->
+      <div class="s4-pic-panel" id="s4PicPanel">
+        <!-- Loaded by JS -->
+      </div>
+      <!-- Builder Panel -->
+      <div class="s4-builder-panel">
+        <div class="builder-title">🎯 Drag adjectives in order:</div>
+        <div class="s4-adj-bank" id="s4Bank"></div>
+        <div style="border-top:2px solid #EEE; padding-top:clamp(8px,1.2vh,16px);">
+          <div class="builder-title" style="margin-bottom:clamp(8px,1.2vh,14px);">Build the sentence:</div>
+          <div class="sb-slots" id="s4Slots"></div>
+        </div>
+        <div class="s4-result" id="s4Result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5 ==================== -->
+<div class="section" id="s5">
+  <div class="sec-hdr">
+    <h1>🏆 The Challenge — Sort All Adjectives!</h1>
+    <span class="sec-badge">Section 5 of 6</span>
+  </div>
+  <div class="s5-body">
+    <!-- Word Bank -->
+    <div class="word-bank" id="s5Bank">
+      <span class="bank-lbl">Sort these:</span>
+    </div>
+    <!-- Columns -->
+    <div class="col-grid" style="flex:1; min-height:0;">
+      <div class="adj-col col-num">
+        <div class="adj-col-hdr">🔢 Number</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="number" id="s5-drop-num">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+      <div class="adj-col col-siz">
+        <div class="adj-col-hdr">📏 Size</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="size" id="s5-drop-siz">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+      <div class="adj-col col-col">
+        <div class="adj-col-hdr">🎨 Colour</div>
+        <div class="adj-col-body">
+          <div class="drop-zone" data-accepts="colour" id="s5-drop-col">
+            <span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 6 ==================== -->
+<div class="section" id="s6">
+  <div class="sec-hdr">
+    <h1>✨ Final Challenge: Build a Sentence!</h1>
+    <span class="sec-badge">Section 6 of 6</span>
+  </div>
+  <div class="s6-body">
+    <div class="s6-instr">Tap each box to choose a word — build a correct sentence!</div>
+    <div class="s6-frame" id="s6Frame"></div>
+    <div class="s6-result" id="s6Result"></div>
+    <button class="btn btn-red" onclick="resetLesson()">🔄 RESET LESSON</button>
+  </div>
+</div>
+
+<!-- Floating drag clone -->
+<div class="wcard" id="drag-clone"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+'use strict';
+
+/* ── SECTION NAVIGATION ── */
+let currentSec = 1;
+const TOTAL = 6;
+
+function goToSection(n) {
+  if (n < 1 || n > TOTAL) return;
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('s' + n).classList.add('active');
+  document.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i === n - 1));
+  currentSec = n;
+  document.getElementById('progressBar').style.width = ((n / TOTAL) * 100) + '%';
+  document.getElementById('prevBtn').style.opacity = n <= 1 ? '0.3' : '0.75';
+  document.getElementById('nextBtn').style.opacity = n >= TOTAL ? '0.3' : '0.75';
+  if (n === 4 && !s4Init) initS4();
+  if (n === 5 && !s5Init) initS5();
+  if (n === 6 && !s6Init) initS6();
+}
+function prevSection() { goToSection(currentSec - 1); }
+function nextSection() { goToSection(currentSec + 1); }
+document.getElementById('prevBtn').style.opacity = '0.3';
+document.getElementById('progressBar').style.width = ((1 / TOTAL) * 100) + '%';
+
+/* ── DRAG & DROP ENGINE ── */
+const clone = document.getElementById('drag-clone');
+let drag = { on: false, el: null, ox: 0, oy: 0 };
+
+function startDrag(e, el) {
+  if (el.classList.contains('locked')) return;
+  e.preventDefault();
+  const touch = e.touches ? e.touches[0] : e;
+  const r = el.getBoundingClientRect();
+  drag = { on: true, el, ox: touch.clientX - r.left, oy: touch.clientY - r.top };
+  clone.textContent = el.textContent;
+  clone.style.width = r.width + 'px';
+  posClone(touch.clientX, touch.clientY);
+  clone.style.display = 'block';
+  el.classList.add('dragging');
+}
+
+function posClone(x, y) {
+  clone.style.left = (x - drag.ox) + 'px';
+  clone.style.top  = (y - drag.oy) + 'px';
+}
+
+function moveDrag(e) {
+  if (!drag.on) return;
+  e.preventDefault();
+  const t = e.touches ? e.touches[0] : e;
+  posClone(t.clientX, t.clientY);
+  clone.style.display = 'none';
+  const under = document.elementFromPoint(t.clientX, t.clientY);
+  clone.style.display = 'block';
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('over'));
+  document.querySelectorAll('.sb-slot').forEach(z => z.classList.remove('over'));
+  if (under) {
+    const dz = under.closest('.drop-zone');
+    if (dz) dz.classList.add('over');
+    const sb = under.closest('.sb-slot');
+    if (sb && !sb.classList.contains('filled')) sb.classList.add('over');
+  }
+}
+
+function endDrag(e) {
+  if (!drag.on) return;
+  const t = e.changedTouches ? e.changedTouches[0] : e;
+  clone.style.display = 'none';
+  drag.el.classList.remove('dragging');
+  document.querySelectorAll('.drop-zone').forEach(z => z.classList.remove('over'));
+  document.querySelectorAll('.sb-slot').forEach(z => z.classList.remove('over'));
+  const under = document.elementFromPoint(t.clientX, t.clientY);
+  if (under) {
+    const dz = under.closest('.drop-zone');
+    const sb = under.closest('.sb-slot');
+    if (dz) dropOnZone(drag.el, dz);
+    else if (sb) dropOnSlot(drag.el, sb);
+  }
+  drag.on = false;
+  drag.el = null;
+}
+
+document.addEventListener('mousemove', moveDrag);
+document.addEventListener('mouseup', endDrag);
+document.addEventListener('touchmove', moveDrag, { passive: false });
+document.addEventListener('touchend', endDrag, { passive: false });
+
+function makeDraggable(el) {
+  el.addEventListener('mousedown', e => startDrag(e, el));
+  el.addEventListener('touchstart', e => startDrag(e, el), { passive: false });
+}
+
+/* ── COLUMN DROP HANDLER ── */
+function dropOnZone(card, zone) {
+  const accepts = zone.dataset.accepts;
+  const ctype   = card.dataset.type;
+  if (accepts === ctype) {
+    const hint = zone.querySelector('.dz-hint');
+    if (hint) hint.remove();
+    zone.appendChild(card);
+    card.classList.remove('wcard'); // keep styles but add locked look
+    card.classList.add('wcard');
+    card.classList.add('locked', 'locked-' + ctype, 'lock-pop');
+    setTimeout(() => card.classList.remove('lock-pop'), 450);
+    fireStars(card);
+  } else {
+    shakeEl(card);
+    flashZone(zone);
+  }
+}
+
+/* ── SECTION 2: EXAMPLES ── */
+function showExample(type) {
+  const reveal = document.getElementById('s2Reveal');
+  document.getElementById('snakeBtn').classList.remove('active');
+  document.getElementById('starsBtn').classList.remove('active');
+  let html = '';
+  if (type === 'snake') {
+    document.getElementById('snakeBtn').classList.add('active');
+    html = `
+      <div class="s2-sentence fade-in-up">a little green snake 🐍</div>
+      <div class="chip-row fade-in-up">
+        <div class="chip chip-plain"><span class="chip-lbl">Article</span>a</div>
+        <div class="chip chip-siz-bg"><span class="chip-lbl">Size</span>little</div>
+        <div class="chip chip-col-bg"><span class="chip-lbl">Colour</span>green</div>
+        <div class="chip chip-plain"><span class="chip-lbl">Noun</span>snake</div>
+      </div>
+      <div class="info-box info-box-tip fade-in-up">
+        <span class="info-icon">💡</span>
+        <span class="info-txt tip">No NUMBER word here — just SIZE then COLOUR!</span>
+      </div>`;
+  } else {
+    document.getElementById('starsBtn').classList.add('active');
+    html = `
+      <div class="s2-sentence fade-in-up">two big yellow stars ⭐⭐</div>
+      <div class="chip-row fade-in-up">
+        <div class="chip chip-num-bg"><span class="chip-lbl">Number</span>two</div>
+        <div class="chip chip-siz-bg"><span class="chip-lbl">Size</span>big</div>
+        <div class="chip chip-col-bg"><span class="chip-lbl">Colour</span>yellow</div>
+        <div class="chip chip-plain"><span class="chip-lbl">Noun</span>stars</div>
+      </div>
+      <div class="info-box info-box-good fade-in-up">
+        <span class="info-icon">✅</span>
+        <span class="info-txt good">NUMBER → SIZE → COLOUR → Noun ✓</span>
+      </div>`;
+  }
+  reveal.innerHTML = html;
+}
+
+/* ── SECTION 4 ── */
+let s4Init = false;
+let s4Idx = 0;
+const S4_PICS = [
+  {
+    emoji: '🌹🌹🌹',
+    label: 'Some little red flowers',
+    adjs: [{ w:'some', t:'number' }, { w:'little', t:'size' }, { w:'red', t:'colour' }],
+    noun: 'flowers'
+  },
+  {
+    emoji: '🐛🐛🐝',
+    label: 'A few tiny black bugs',
+    adjs: [{ w:'a few', t:'number' }, { w:'tiny', t:'size' }, { w:'black', t:'colour' }],
+    noun: 'bugs'
+  },
+  {
+    emoji: '💜',
+    label: 'One large purple flower',
+    adjs: [{ w:'one', t:'number' }, { w:'large', t:'size' }, { w:'purple', t:'colour' }],
+    noun: 'flower'
+  }
+];
+
+function initS4() {
+  s4Init = true;
+  loadS4Pic(0);
+}
+
+function cycleS4() {
+  s4Idx = (s4Idx + 1) % S4_PICS.length;
+  loadS4Pic(s4Idx);
+}
+
+function clearS4Slots() {
+  loadS4Pic(s4Idx);
+}
+
+function loadS4Pic(idx) {
+  const pic = S4_PICS[idx];
+  document.getElementById('s4Counter').textContent = `Picture ${idx + 1} of ${S4_PICS.length}`;
+  document.getElementById('s4Result').textContent = '';
+  // Picture panel
+  document.getElementById('s4PicPanel').innerHTML = `
+    <div class="pic-emoji">${pic.emoji}</div>
+    <div class="pic-lbl">${pic.label}</div>
+  `;
+  // Adj bank - shuffled
+  const bank = document.getElementById('s4Bank');
+  bank.innerHTML = '';
+  [...pic.adjs].sort(() => Math.random() - 0.5).forEach(a => {
+    const card = document.createElement('div');
+    card.className = 'wcard';
+    card.dataset.word = a.w;
+    card.dataset.type = a.t;
+    card.textContent = a.w;
+    bank.appendChild(card);
+    makeDraggable(card);
+  });
+  // Slots
+  const slots = document.getElementById('s4Slots');
+  slots.innerHTML = '';
+  pic.adjs.forEach(a => {
+    const sl = document.createElement('div');
+    sl.className = `sb-slot slot-${a.t}`;
+    sl.dataset.slotType = a.t;
+    sl.innerHTML = `<span class="slot-type-lbl">${a.t.charAt(0).toUpperCase()+a.t.slice(1)}</span>`;
+    slots.appendChild(sl);
+  });
+  // Noun fixed
+  const noun = document.createElement('div');
+  noun.className = 'sb-noun-fixed';
+  noun.textContent = pic.noun;
+  slots.appendChild(noun);
+}
+
+function dropOnSlot(card, slot) {
+  const st = slot.dataset.slotType;
+  const ct = card.dataset.type;
+  if (st !== ct) {
+    shakeEl(card);
+    slot.style.borderColor = 'var(--col)';
+    setTimeout(() => slot.style.borderColor = '', 500);
+    return;
+  }
+  slot.innerHTML = '';
+  slot.classList.add('filled');
+  const span = document.createElement('span');
+  span.style.cssText = "font-family:'Baloo 2',sans-serif; font-size:clamp(18px,2.2vw,32px); font-weight:800; color:" +
+    (st === 'number' ? 'var(--num)' : st === 'size' ? 'var(--siz)' : 'var(--col)');
+  span.textContent = card.dataset.word;
+  slot.appendChild(span);
+  card.style.display = 'none';
+  // Check all filled
+  const allSlots = document.querySelectorAll('#s4Slots .sb-slot');
+  if ([...allSlots].every(s => s.classList.contains('filled'))) {
+    const res = document.getElementById('s4Result');
+    res.textContent = '⭐ ' + S4_PICS[s4Idx].label + ' ⭐';
+    res.classList.add('celebrate');
+    setTimeout(() => res.classList.remove('celebrate'), 700);
+    launchConfetti(12);
+    fireStars(res);
+  }
+}
+
+/* ── SECTION 5 ── */
+let s5Init = false;
+const S5_WORDS = [
+  { w:'three', t:'number' }, { w:'tiny', t:'size' }, { w:'colossal', t:'size' },
+  { w:'violet', t:'colour' }, { w:'azure', t:'colour' }, { w:'seven', t:'number' },
+  { w:'immense', t:'size' }, { w:'black', t:'colour' }
+];
+
+function initS5() {
+  s5Init = true;
+  const bank = document.getElementById('s5Bank');
+  [...S5_WORDS].sort(() => Math.random() - 0.5).forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'wcard';
+    card.dataset.word = w.w;
+    card.dataset.type = w.t;
+    card.dataset.sec = '5';
+    card.textContent = w.w;
+    bank.appendChild(card);
+    makeDraggable(card);
+  });
+}
+
+/* ── SECTION 6 ── */
+let s6Init = false;
+const S6_OPTS = {
+  number: ['one', 'two', 'three', 'some', 'a few', 'seven'],
+  size:   ['big', 'small', 'tiny', 'large', 'enormous', 'little'],
+  colour: ['red', 'blue', 'green', 'yellow', 'purple', 'orange'],
+  noun:   ['snake', 'flower', 'bug', 'star', 'butterfly', 'frog']
+};
+let s6State = {};
+let s6OpenKey = null;
+
+function initS6() {
+  s6Init = true;
+  buildS6();
+}
+
+function buildS6() {
+  const frame = document.getElementById('s6Frame');
+  frame.innerHTML = '';
+  const defs = [
+    { k:'number', lbl:'Number', icon:'🔢' },
+    { k:'size',   lbl:'Size',   icon:'📏' },
+    { k:'colour', lbl:'Colour', icon:'🎨' },
+    { k:'noun',   lbl:'Noun',   icon:'📦' }
+  ];
+  defs.forEach((d, i) => {
+    if (i > 0) {
+      const pl = document.createElement('div');
+      pl.className = 's6-plus'; pl.textContent = '+';
+      frame.appendChild(pl);
+    }
+    const slot = document.createElement('div');
+    slot.className = `s6-slot slot-${d.k}`;
+    slot.id = `s6sl-${d.k}`;
+    slot.innerHTML = `
+      <div class="s6-slot-lbl">${d.icon} ${d.lbl}</div>
+      <div class="s6-slot-val" id="s6v-${d.k}">?</div>
+      <div class="s6-picker" id="s6p-${d.k}"></div>
+    `;
+    slot.addEventListener('click', e => { e.stopPropagation(); togglePicker(d.k); });
+    frame.appendChild(slot);
+  });
+  document.addEventListener('click', closeAllPickers, { capture: false });
+}
+
+function togglePicker(key) {
+  const picker = document.getElementById('s6p-' + key);
+  const isOpen = picker.classList.contains('open');
+  closeAllPickers();
+  if (!isOpen) {
+    picker.innerHTML = '';
+    S6_OPTS[key].forEach(word => {
+      const opt = document.createElement('div');
+      opt.className = 's6-opt';
+      opt.textContent = word;
+      opt.addEventListener('click', e => { e.stopPropagation(); selectS6(key, word); });
+      picker.appendChild(opt);
+    });
+    picker.classList.add('open');
+    document.getElementById('s6sl-' + key).classList.add('selected');
+    s6OpenKey = key;
+  }
+}
+
+function closeAllPickers() {
+  document.querySelectorAll('.s6-picker').forEach(p => p.classList.remove('open'));
+  document.querySelectorAll('.s6-slot').forEach(s => s.classList.remove('selected'));
+  s6OpenKey = null;
+}
+
+function selectS6(key, word) {
+  s6State[key] = word;
+  document.getElementById('s6v-' + key).textContent = word;
+  document.getElementById('s6sl-' + key).classList.add('filled');
+  closeAllPickers();
+  if (s6State.number && s6State.size && s6State.colour && s6State.noun) {
+    const sentence = `${s6State.number} ${s6State.size} ${s6State.colour} ${s6State.noun}`;
+    const res = document.getElementById('s6Result');
+    res.textContent = '🌟 ' + sentence.charAt(0).toUpperCase() + sentence.slice(1) + '!';
+    res.classList.add('celebrate');
+    setTimeout(() => res.classList.remove('celebrate'), 700);
+    launchConfetti(24);
+    fireStars(res);
+  }
+}
+
+/* ── ANIMATIONS ── */
+function fireStars(el) {
+  const r = el.getBoundingClientRect();
+  const cx = r.left + r.width / 2;
+  const cy = r.top  + r.height / 2;
+  const icons = ['⭐','✨','🌟','💫'];
+  for (let i = 0; i < 7; i++) {
+    const s = document.createElement('div');
+    s.className = 'star-burst';
+    s.textContent = icons[i % icons.length];
+    s.style.left = (cx + (Math.random() - 0.5) * 120) + 'px';
+    s.style.top  = (cy + (Math.random() - 0.5) * 90) + 'px';
+    s.style.animationDelay = (i * 0.08) + 's';
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 1400);
+  }
+}
+
+function launchConfetti(n) {
+  const colors = ['#FFD700','#FF6B35','#4CAF50','#2196F3','#9C27B0','#FF4081','#00BCD4'];
+  for (let i = 0; i < n; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.background = colors[i % colors.length];
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '3px';
+    p.style.setProperty('--dur', (1.4 + Math.random() * 0.8) + 's');
+    p.style.setProperty('--delay', (Math.random() * 0.4) + 's');
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 2800);
+  }
+}
+
+function shakeEl(el) {
+  el.classList.remove('wrong-shake');
+  void el.offsetWidth; // reflow
+  el.classList.add('wrong-shake');
+  setTimeout(() => el.classList.remove('wrong-shake'), 450);
+}
+
+function flashZone(zone) {
+  zone.style.background = 'rgba(198,40,40,0.18)';
+  zone.style.borderColor = 'var(--col)';
+  setTimeout(() => {
+    zone.style.background = '';
+    zone.style.borderColor = '';
+  }, 500);
+}
+
+/* ── INIT DRAGGABLES ON PAGE ── */
+document.querySelectorAll('#s3 .wcard, #s3 .word-bank .wcard').forEach(makeDraggable);
+
+/* ── RESET ── */
+function resetLesson() {
+  if (!confirm('Reset the entire lesson? All progress will be lost.')) return;
+
+  // S2
+  document.getElementById('s2Reveal').innerHTML = `<div style="font-family:'Baloo 2',sans-serif;font-size:clamp(20px,2.4vw,34px);font-weight:700;color:#CCC;text-align:center;">👆 Tap an example button to reveal it</div>`;
+  document.getElementById('snakeBtn').classList.remove('active');
+  document.getElementById('starsBtn').classList.remove('active');
+
+  // S3
+  const s3Bank = document.getElementById('s3Bank');
+  ['c3-four','c3-enormous','c3-tiny','c3-crimson','c3-dozens'].forEach(id => {
+    const card = document.getElementById(id);
+    if (card) {
+      card.classList.remove('locked','locked-number','locked-size','locked-colour','lock-pop','dragging');
+      s3Bank.appendChild(card);
+    }
+  });
+  ['s3-drop-num','s3-drop-siz','s3-drop-col'].forEach(id => {
+    const dz = document.getElementById(id);
+    if (dz) dz.innerHTML = `<span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>`;
+  });
+
+  // S4
+  s4Init = false;
+  s4Idx = 0;
+
+  // S5
+  s5Init = false;
+  document.getElementById('s5Bank').innerHTML = '<span class="bank-lbl">Sort these:</span>';
+  ['s5-drop-num','s5-drop-siz','s5-drop-col'].forEach(id => {
+    const dz = document.getElementById(id);
+    if (dz) dz.innerHTML = `<span class="dz-hint" style="color:#CCC;font-family:'Baloo 2',sans-serif;font-size:clamp(16px,1.8vw,24px);font-weight:600;margin:auto;display:block;text-align:center;">Drop here</span>`;
+  });
+
+  // S6
+  s6Init = false;
+  s6State = {};
+  s6OpenKey = null;
+  document.getElementById('s6Frame').innerHTML = '';
+  document.getElementById('s6Result').textContent = '';
+
+  goToSection(1);
+}
+</script>
+</body>
+</html>
